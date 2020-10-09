@@ -89,7 +89,7 @@ class HttpServer():
         """
 
         if path.endswith('/'):
-            return b"text/plain"
+            return b"text/html"
         else:
             guessed_type = mimetypes.guess_type(path)
             return guessed_type[0].encode()
@@ -128,11 +128,20 @@ class HttpServer():
             # so this should raise a FileNotFoundError.
         """
 
-        if os.path.isdir(os.path.join('webroot', *path.split('/'))):
-            contents = os.listdir(os.path.join('webroot', *path.split('/')))
-            return '\r\n'.join(contents).encode()
+        local_path = os.path.join('webroot', *path.split('/'))
 
-        elif os.path.isfile(os.path.join('webroot', *path.split('/'))):
+        if os.path.isdir(local_path):
+            contents = os.listdir(os.path.join('webroot', *path.split('/')))
+            for ind, file in enumerate(contents):
+                if os.path.isdir(os.path.join('webroot',*path.split('/'), file)):
+                    contents[ind] = f'{file}/'
+
+            link_list = [f'\n<a href="{os.path.join(path,file)}">{file}</a><br>'
+                         for file in contents]
+
+            return '\r\n'.join(link_list).encode()
+
+        elif os.path.isfile(local_path):
             with open(f'webroot{path}', 'rb') as fp:
                 file_content = fp.read()
                 return file_content
