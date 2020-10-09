@@ -3,6 +3,7 @@ import subprocess
 import http.client
 import os
 import random
+import time
 
 
 class WebTestCase(unittest.TestCase):
@@ -29,6 +30,7 @@ class WebTestCase(unittest.TestCase):
         """
         Helper function to get a response from a given url, using http.client
         """
+        time.sleep(.25)
 
         conn = http.client.HTTPConnection('localhost:{}'.format(self.port))
         conn.request('GET', url)
