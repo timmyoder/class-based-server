@@ -55,7 +55,10 @@ class HttpServer():
         Then you would return "/images/sample_1.png"
         """
 
-        return "TODO: COMPLETE THIS"  # TODO
+        request_text = request.split(" ")
+        path = request_text[1]
+
+        return path
 
 
     @staticmethod
@@ -88,7 +91,8 @@ class HttpServer():
         if path.endswith('/'):
             return b"text/plain"
         else:
-            return b"TODO: FINISH THE REST OF THESE CASES"  # TODO
+            guessed_type = mimetypes.guess_type(path)
+            return guessed_type[0].encode()
 
     @staticmethod
     def get_content(path):
@@ -124,7 +128,16 @@ class HttpServer():
             # so this should raise a FileNotFoundError.
         """
 
-        return b"Not implemented!"  # TODO: Complete this function.
+        if os.path.isdir(os.path.join('webroot', *path.split('/'))):
+            contents = os.listdir(os.path.join('webroot', *path.split('/')))
+            return '\r\n'.join(contents).encode()
+
+        elif os.path.isfile(os.path.join('webroot', *path.split('/'))):
+            with open(f'webroot{path}', 'rb') as fp:
+                file_content = fp.read()
+                return file_content
+        else:
+            raise FileNotFoundError
 
     def __init__(self, port):
         self.port = port
